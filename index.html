@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Ayuu Music - Discord Bot</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ayuu Music is a high quality Discord music bot with 24/7, filters, playlists and more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-alt: #020617;
+      --card: rgba(15, 23, 42, 0.95);
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --accent-strong: #0ea5e9;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --border: rgba(148, 163, 184, 0.3);
+      --radius-lg: 18px;
+      --radius-xl: 24px;
+      --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.9);
+      --nav-height: 72px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0b1120 0, #020617 40%, #000 100%);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .noise {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.13;
+      mix-blend-mode: soft-light;
+      background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+      z-index: -1;
+    }
+
+    .glow {
+      position: fixed;
+      width: 520px;
+      height: 520px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.18), transparent 60%);
+      filter: blur(24px);
+      top: -120px;
+      right: -160px;
+      z-index: -2;
+    }
+
+    .glow-2 {
+      position: fixed;
+      width: 420px;
+      height: 420px;
+      border-radius: 999px;
+      background: radial-gradient(circle, rgba(129, 140, 248, 0.22), transparent 60%);
+      filter: blur(26px);
+      bottom: -120px;
+      left: -100px;
+      z-index: -2;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(18px);
+      background: linear-gradient(to bottom, rgba(2, 6, 23, 0.96), rgba(2, 6, 23, 0.75), transparent);
+      border-bottom: 1px solid rgba(15, 23, 42, 0.85);
+    }
+
+    .nav-inner {
+      height: var(--nav-height);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 0, #f9fafb, #38bdf8 40%, #0f172a 80%);
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+     _font-weight: 700;
+      color: #0b1120;
+      font-size: 1.2rem;
+    }
+
+    .brand-text-main {
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      font-size: 1.1rem;
+    }
+
+    .brand-text-sub {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.16em;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 0.9rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      color: var(--muted);
+      transition: color 0.18s ease, transform 0.18s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .pill {
+      font-size: 0.7rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.18), transparent 50%);
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
+    }
+
+    .nav-cta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      border-radius: 999px;
+      border: 1px solid transparent;
+      padding: 8px 16px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.18s ease;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent-strong), #6366f1);
+      color: #0b1120;
+      box-shadow: 0 10px 35px rgba(56, 189, 248, 0.5);
+      font-weight: 600;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 0 14px 40px rgba(56, 189, 248, 0.7);
+    }
+
+    .btn-ghost {
+      background: rgba(15, 23, 42, 0.7);
+      color: var(--text);
+      border-color: rgba(148, 163, 184, 0.5);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-icon {
+      font-size: 1.1rem;
+    }
+
+    .menu-toggle {
+      display: none;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      width: 38px;
+      height: 38px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .menu-line {
+      width: 18px;
+      height: 2px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      position: relative;
+    }
+
+    .menu-line::before,
+    .menu-line::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      width: 18px;
+      height: 2px;
+      border-radius: 999px;
+      background: inherit;
+      transition: transform 0.25s ease, top 0.25s ease, bottom 0.25s ease, opacity 0.25s ease;
+    }
+
+    .menu-line::before {
+      top: -6px;
+    }
+
+    .menu-line::after {
+      bottom: -6px;
+    }
+
+    .menu-toggle.active .menu-line {
+      background: transparent;
+    }
+
+    .menu-toggle.active .menu-line::before {
+      top: 0;
+      transform: rotate(45deg);
+    }
+
+    .menu-toggle.active .menu-line::after {
+      bottom: 0;
+      transform: rotate(-45deg);
+    }
+
+    .nav-mobile {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 12px;
+    }
+
+    .nav-mobile a {
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .nav-mobile a:hover {
+      color: var(--accent);
+    }
+
+    /* HERO */
+
+    main {
+      padding-bottom: 80px;
+    }
+
+    .hero {
+      padding: 52px 0 40px;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+      gap: 36px;
+      align-items: center;
+    }
+
+    .hero-pre {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.18), transparent 60%);
+      border-radius: 999px;
+      padding: 5px 12px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-bottom: 18px;
+    }
+
+    .hero-pre span {
+      font-size: 0.8rem;
+      color: var(--accent);
+    }
+
+    .hero-title {
+      font-size: clamp(2.4rem, 5vw, 3.3rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-bottom: 10px;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, #38bdf8, #a855f7, #eab308);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 0.98rem;
+      color: var(--muted);
+      max-width: 430px;
+      margin-bottom: 22px;
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .hero-meta-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-meta-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 16px rgba(34, 197, 94, 0.8);
+    }
+
+    .hero-card {
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.25), transparent 55%), radial-gradient(circle at 100% 100%, rgba(129, 140, 248, 0.35), transparent 55%), rgba(15, 23, 42, 0.96);
+      box-shadow: var(--shadow-soft);
+      padding: 18px 18px 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .server-name {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .server-badge {
+      font-size: 0.75rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .server-badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #22c55e;
+    }
+
+    .now-playing {
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      background: rgba(15, 23, 42, 0.96);
+      padding: 12px 12px 10px;
+      display: grid;
+      grid-template-columns: 50px minmax(0, 1fr);
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .cover {
+      width: 50px;
+      height: 50px;
+      border-radius: 999px;
+      background: conic-gradient(from 140deg, #38bdf8, #a855f7, #eab308, #22c55e, #38bdf8);
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cover-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: inherit;
+      background: radial-gradient(circle at 30% 0, #f9fafb, #020617 70%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #020617;
+    }
+
+    .track-title {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .track-artist {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .track-bar {
+      margin-top: 8px;
+    }
+
+    .track-time {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .track-progress {
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      overflow: hidden;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+    }
+
+    .track-progress-inner {
+      width: 65%;
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #a855f7);
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.7);
+    }
+
+    .controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 10px;
+      gap: 10px;
+    }
+
+    .controls-left,
+    .controls-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chip {
+      font-size: 0.7rem;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .chip-pill {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #f97316;
+    }
+
+    .chip-glow {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: #38bdf8;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.9);
+    }
+
+    .circle-btn {
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .circle-btn.primary {
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      color: #020617;
+      border-color: transparent;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.8);
+    }
+
+    .hero-command-box {
+      margin-top: 10px;
+      border-radius: 999px;
+      padding: 6px 10px;
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-command-box code {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      color: var(--accent);
+      font-size: 0.76rem;
+    }
+
+    .hero-command-box span {
+      font-size: 0.7rem;
+    }
+
+    /* SECTIONS */
+
+    .section {
+      padding: 32px 0;
+    }
+
+    .section-header {
+      margin-bottom: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .section-eyebrow {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--muted);
+    }
+
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+    }
+
+    .section-subtitle {
+      font-size: 0.9rem;
+      color: var(--muted);
+      max-width: 500px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: linear-gradient(to bottom right, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.96));
+      padding: 14px 14px 12px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: inherit;
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), transparent, rgba(129, 140, 248, 0.3));
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      z-index: -1;
+    }
+
+    .card:hover::before {
+      opacity: 1;
+    }
+
+    .card:hover {
+      border-color: rgba(148, 163, 184, 0.7);
+      transform: translateY(-2px);
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.96);
+    }
+
+    .card-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+
+    .card-title {
+      font-size: 0.95rem;
+      font-weight: 500;
+      margin-bottom: 6px;
+    }
+
+    .card-body {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* COMMANDS */
+
+    .commands-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    .commands-table {
+      width: 100%;
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.96);
+      font-size: 0.8rem;
+      overflow: hidden;
+    }
+
+    .commands-table-header,
+    .commands-table-row {
+      display: grid;
+      grid-template-columns: 0.9fr 1.6fr 0.6fr;
+      padding: 9px 10px;
+      align-items: center;
+    }
+
+    .commands-table-header {
+      background: rgba(15, 23, 42, 0.9);
+      border-bottom: 1px solid rgba(30, 64, 175, 0.8);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    .commands-table-row:nth-child(odd) {
+      background: rgba(15, 23, 42, 0.94);
+    }
+
+    .commands-table-row:nth-child(even) {
+      background: rgba(15, 23, 42, 0.98);
+    }
+
+    .commands-table-row span {
+      display: block;
+    }
+
+    .commands-table-row code {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 0.76rem;
+      color: var(--accent);
+    }
+
+    .tag {
+      font-size: 0.7rem;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.18);
+      border: 1px solid rgba(37, 99, 235, 0.6);
+      color: #bfdbfe;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: fit-content;
+    }
+
+    .commands-side {
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.25), transparent 60%), rgba(15, 23, 42, 0.97);
+      padding: 14px 14px 12px;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .step-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .step-badge {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    /* FAQ */
+
+    .faq-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+      gap: 18px;
+      align-items: flex-start;
+    }
+
+    .faq-card {
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.96);
+      padding: 12px 12px 10px;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid rgba(30, 41, 59, 0.9);
+    }
+
+    .faq-item:last-child {
+      border-bottom: none;
+    }
+
+    .faq-question {
+      padding: 8px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .faq-question h4 {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .faq-toggle {
+      font-size: 1.1rem;
+      color: var(--muted);
+      min-width: 18px;
+      text-align: center;
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.22s ease;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .faq-answer-inner {
+      padding-bottom: 8px;
+    }
+
+    .faq-answer.open {
+      padding-top: 0;
+    }
+
+    .faq-answer.open .faq-answer-inner {
+      padding-top: 0;
+    }
+
+    .faq-answer.show {
+      max-height: 200px;
+    }
+
+    /* FOOTER */
+
+    footer {
+      border-top: 1px solid rgba(15, 23, 42, 0.95);
+      padding: 18px 0 20px;
+      margin-top: 10px;
+      background: radial-gradient(circle at 50% -20%, rgba(56, 189, 248, 0.18), transparent 60%), rgba(2, 6, 23, 0.98);
+    }
+
+    .footer-inner {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent);
+    }
+
+    /* RESPONSIVE */
+
+    @media (max-width: 900px) {
+      .hero-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .hero-card {
+        order: -1;
+      }
+
+      .commands-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .faq-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .nav-cta {
+        display: none;
+      }
+
+      .menu-toggle {
+        display: flex;
+      }
+
+      .nav-mobile {
+        display: flex;
+      }
+
+      .hero {
+        padding-top: 32px;
+      }
+
+      .features-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 600px) {
+      .features-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .commands-table-header,
+      .commands-table-row {
+        grid-template-columns: 1.1fr 1.9fr;
+      }
+
+      .commands-table-header span:last-child,
+      .commands-table-row span:last-child {
+        display: none;
+      }
+    }
+
+    @media (max-width: 450px) {
+      .hero-title {
+        font-size: 2.1rem;
+      }
+
+      .hero-meta {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="noise"></div>
+  <div class="glow"></div>
+  <div class="glow-2"></div>
+
+  <!-- NAVBAR -->
+  <header class="navbar">
+    <div class="container">
+      <div class="nav-inner">
+        <div class="brand">
+          <div class="brand-logo">A</div>
+          <div>
+            <div class="brand-text-main">Ayuu Music</div>
+            <div class="brand-text-sub">DISCORD BOT</div>
+          </div>
+        </div>
+
+        <div class="nav-links">
+          <a href="#features">Features</a>
+          <a href="#commands">Commands</a>
+          <a href="#how">How it works</a>
+          <a href="#faq">FAQ</a>
+        </div>
+
+        <div class="nav-cta">
+          <span class="pill">
+            <span class="pill-dot"></span> Online 24/7
+          </span>
+          <a href="https://discord.com/oauth2/authorize?client_id=YOUR_BOT_ID&scope=bot%20applications.commands&permissions=8"
+             class="btn btn-primary">
+            <span class="btn-icon">➕</span> Add to Discord
+          </a>
+        </div>
+
+        <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">
+          <div class="menu-line"></div>
+        </button>
+      </div>
+
+      <div class="nav-mobile" id="mobileMenu">
+        <a href="#features">Features</a>
+        <a href="#commands">Commands</a>
+        <a href="#how">How it works</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://discord.com/oauth2/authorize?client_id=YOUR_BOT_ID&scope=bot%20applications.commands&permissions=8"
+           class="btn btn-primary" style="margin-top:4px; justify-content:center;">
+          ➕ Add to Discord
+        </a>
+        <a href="https://discord.gg/YOUR_SUPPORT" class="btn btn-ghost" style="margin-top:4px; justify-content:center;">
+          💬 Support Server
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero" id="top">
+      <div class="container">
+        <div class="hero-grid">
+          <div>
+            <div class="hero-pre">
+              <span>New</span> Lag-free music for every Discord server
+            </div>
+            <h1 class="hero-title">
+              Premium quality music for your <span>Discord community</span>.
+            </h1>
+            <p class="hero-subtitle">
+              Ayuu Music plays high quality 24/7 music from YouTube, Spotify &amp; more.
+              Smart filters, playlists, DJ mode and simple commands — all in one bot.
+            </p>
+
+            <div class="hero-cta">
+              <a href="https://discord.com/oauth2/authorize?client_id=YOUR_BOT_ID&scope=bot%20applications.commands&permissions=8"
+                 class="btn btn-primary">
+                <span class="btn-icon">🎧</span> Invite Ayuu
+              </a>
+              <a href="https://discord.gg/YOUR_SUPPORT" class="btn btn-ghost">
+                <span class="btn-icon">💬</span> Join Support
+              </a>
+            </div>
+
+            <div class="hero-meta">
+              <div class="hero-meta-item">
+                <div class="hero-meta-dot"></div>
+                Trusted by 1000+ servers
+              </div>
+              <div class="hero-meta-item">
+                <span>⚡</span> 24/7 uptime &amp; low ping
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="hero-card" aria-label="Ayuu Music now playing UI">
+              <div class="hero-card-header">
+                <div>
+                  <div class="server-name">Ayuu's Chill Lounge</div>
+                  <div style="font-size:0.75rem; color:var(--muted);">#music • 154 listeners</div>
+                </div>
+                <div class="server-badge">
+                  <span class="server-badge-dot"></span> Playing now
+                </div>
+              </div>
+
+              <div class="now-playing">
+                <div class="cover">
+                  <div class="cover-inner">🎵</div>
+                </div>
+                <div>
+                  <div class="track-title">LoFi Rain - Chill Night Beats</div>
+                  <div class="track-artist">Requested by @ayu</div>
+                  <div class="track-bar">
+                    <div class="track-time">
+                      <span>01:24</span>
+                      <span>03:56</span>
+                    </div>
+                    <div class="track-progress">
+                      <div class="track-progress-inner"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="controls">
+                <div class="controls-left">
+                  <div class="circle-btn">⏮</div>
+                  <div class="circle-btn primary">⏯</div>
+                  <div class="circle-btn">⏭</div>
+                </div>
+                <div class="controls-right">
+                  <div class="chip">
+                    <span class="chip-pill"></span> Bass Boost
+                  </div>
+                  <div class="chip">
+                    <span class="chip-glow"></span> 24/7
+                  </div>
+                </div>
+              </div>
+
+              <div class="hero-command-box" aria-label="Example command">
+                <span>Try:</span>
+                <code>/play lofi chill mix</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="section" id="features">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">Features</span>
+          <div class="section-title">Everything your music channel needs.</div>
+          <p class="section-subtitle">
+            Simple commands for normal users, powerful controls for DJs. No paywalls for basic features.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <article class="card">
+            <div class="card-icon">🎶</div>
+            <h3 class="card-title">High quality audio</h3>
+            <p class="card-body">
+              Stable, high-bitrate playback with automatic reconnection so your music never randomly stops.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">📜</div>
+            <h3 class="card-title">Smart queue &amp; playlists</h3>
+            <p class="card-body">
+              Add full playlists, loop tracks, shuffle, skip voting and more — all from simple slash commands.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">🛡️</div>
+            <h3 class="card-title">Role-based control</h3>
+            <p class="card-body">
+              Lock advanced commands to DJ or staff roles so your queue is always safe from trolls.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">🎛️</div>
+            <h3 class="card-title">Audio filters</h3>
+            <p class="card-body">
+              Bass boost, nightcore, karaoke, 8D, vaporwave &amp; more filters to perfectly match your vibe.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">🌐</div>
+            <h3 class="card-title">Multi-source support</h3>
+            <p class="card-body">
+              Play tracks from YouTube, SoundCloud, direct links and more. Just paste and enjoy.
+            </p>
+          </article>
+
+          <article class="card">
+            <div class="card-icon">⚡</div>
+            <h3 class="card-title">Optimized for speed</h3>
+            <p class="card-body">
+              Hosted on fast infrastructure with automatic scaling so your songs start instantly.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMMANDS -->
+    <section class="section" id="commands">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">Commands</span>
+          <div class="section-title">Easy to learn, hard to give up.</div>
+          <p class="section-subtitle">
+            Ayuu Music uses slash commands that are auto-completed by Discord. No complex prefixes or spam.
+          </p>
+        </div>
+
+        <div class="commands-layout">
+          <div class="commands-table" aria-label="Common commands">
+            <div class="commands-table-header">
+              <span>Command</span>
+              <span>Description</span>
+              <span>Category</span>
+            </div>
+
+            <div class="commands-table-row">
+              <span><code>/play &lt;song&gt;</code></span>
+              <span>Search or paste a link to play music in your voice channel.</span>
+              <span><span class="tag">Music</span></span>
+            </div>
+
+            <div class="commands-table-row">
+              <span><code>/skip</code></span>
+              <span>Skip the current track. Optional vote skip in big servers.</span>
+              <span><span class="tag">Music</span></span>
+            </div>
+
+            <div class="commands-table-row">
+              <span><code>/pause</code></span>
+              <span>Pause the current track and resume anytime.</span>
+              <span><span class="tag">Music</span></span>
+            </div>
+
+            <div class="commands-table-row">
+              <span><code>/queue</code></span>
+              <span>See the upcoming tracks and manage the queue.</span>
+              <span><span class="tag">Queue</span></span>
+            </div>
+
+            <div class="commands-table-row">
+              <span><code>/filter</code></span>
+              <span>Enable filters like bassboost, nightcore, 8D and more.</span>
+              <span><span class="tag">Filters</span></span>
+            </div>
+
+            <div class="commands-table-row">
+              <span><code>/24_7</code></span>
+              <span>Toggle 24/7 mode so the bot never leaves your channel.</span>
+              <span><span class="tag">Utility</span></span>
+            </div>
+
+            <div class="commands-table-row">
+              <span><code>/volume</code></span>
+              <span>Adjust the volume without touching Discord sliders.</span>
+              <span><span class="tag">Utility</span></span>
+            </div>
+
+            <div class="commands-table-row">
+              <span><code>/help</code></span>
+              <span>View all commands and their explanations inside Discord.</span>
+              <span><span class="tag">Info</span></span>
+            </div>
+          </div>
+
+          <aside class="commands-side">
+            <div class="section-title" style="font-size:1.05rem; margin-bottom:6px;">
+              Get started in under 30 seconds.
+            </div>
+            <p style="font-size:0.84rem; color:var(--muted);">
+              You only need three simple steps to make your server sound amazing.
+            </p>
+
+            <div class="step-list" id="how">
+              <div class="step-item">
+                <div class="step-badge">1</div>
+                <div>
+                  <strong>Invite Ayuu Music</strong><br />
+                  Click the “Invite Ayuu” button and select the server you want to add the bot to.
+                </div>
+              </div>
+              <div class="step-item">
+                <div class="step-badge">2</div>
+                <div>
+                  <strong>Join a voice channel</strong><br />
+                  Join any voice channel where you want to play music and grant the bot permission to connect/speak.
+                </div>
+              </div>
+              <div class="step-item">
+                <div class="step-badge">3</div>
+                <div>
+                  <strong>Use a command</strong><br />
+                  Type <code>/play</code> and the name or link of a song. Ayuu will join and start playing instantly.
+                </div>
+              </div>
+            </div>
+
+            <div style="margin-top:12px; font-size:0.78rem; color:var(--muted);">
+              Need help setting up DJ roles or filters?
+              <a href="https://discord.gg/YOUR_SUPPORT" style="color:var(--accent); text-decoration:none;">Join the support server</a>.
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">Help</span>
+          <div class="section-title">Frequently asked questions.</div>
+          <p class="section-subtitle">
+            If your question isn't listed here, you can always ask directly in the support server.
+          </p>
+        </div>
+
+        <div class="faq-grid">
+          <div class="faq-card">
+            <div class="faq-item">
+              <div class="faq-question">
+                <h4>Is Ayuu Music free to use?</h4>
+                <div class="faq-toggle">+</div>
+              </div>
+              <div class="faq-answer">
+                <div class="faq-answer-inner">
+                  Yes. All core music features like play, pause, queue, filters and 24/7 mode are completely free.
+                  If premium is added in future, it will only unlock extra cosmetic features — not the basic music commands.
+                </div>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">
+                <h4>Why is the bot not joining my voice channel?</h4>
+                <div class="faq-toggle">+</div>
+              </div>
+              <div class="faq-answer">
+                <div class="faq-answer-inner">
+                  Make sure Ayuu has <strong>Connect</strong> and <strong>Speak</strong> permissions in that channel.
+                  Also check if your server has any permission overrides or a music-only voice channel enabled.
+                </div>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">
+                <h4>Can I restrict who can control the music?</h4>
+                <div class="faq-toggle">+</div>
+              </div>
+              <div class="faq-answer">
+                <div class="faq-answer-inner">
+                  Yes. You can configure a DJ role and allow only that role (or admins) to use sensitive commands
+                  like <code>/skip</code>, <code>/stop</code> or <code>/clear</code>. Check the in-bot <code>/help</code> panel for details.
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="faq-card">
+            <div class="faq-item">
+              <div class="faq-question">
+                <h4>Does Ayuu support Spotify or Apple Music?</h4>
+                <div class="faq-toggle">+</div>
+              </div>
+              <div class="faq-answer">
+                <div class="faq-answer-inner">
+                  You can paste Spotify playlist or track links and Ayuu will try to find the closest match from supported sources
+                  (for example YouTube). Direct Apple Music support depends on platform rules and may be limited.
+                </div>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">
+                <h4>Is the bot online 24/7?</h4>
+                <div class="faq-toggle">+</div>
+              </div>
+              <div class="faq-answer">
+                <div class="faq-answer-inner">
+                  The bot is hosted on reliable infrastructure with auto restart, so uptime is very high.
+                  Rare restarts may happen for updates or maintenance, but music will resume from new commands quickly.
+                </div>
+              </div>
+            </div>
+
+            <div class="faq-item">
+              <div class="faq-question">
+                <h4>How do I report a bug or suggest a feature?</h4>
+                <div class="faq-toggle">+</div>
+              </div>
+              <div class="faq-answer">
+                <div class="faq-answer-inner">
+                  Join the support server and open a ticket or post in the feedback channel with as much detail as possible
+                  (error messages, screenshots, what command you used etc.). This helps fix issues much faster.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <div>
+          © <span id="year"></span> Ayuu Music • Built with ❤️ for Discord communities.
+        </div>
+        <div class="footer-links">
+          <a href="https://discord.com/oauth2/authorize?client_id=YOUR_BOT_ID&scope=bot%20applications.commands&permissions=8">Invite bot</a>
+          <a href="https://discord.gg/YOUR_SUPPORT">Support server</a>
+          <a href="#top">Back to top ↑</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Dynamic year
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Mobile menu toggle
+    const menuToggle = document.getElementById("menuToggle");
+    const mobileMenu = document.getElementById("mobileMenu");
+
+    menuToggle.addEventListener("click", () => {
+      menuToggle.classList.toggle("active");
+      const isOpen = menuToggle.classList.contains("active");
+      mobileMenu.style.maxHeight = isOpen ? mobileMenu.scrollHeight + "px" : "0px";
+      mobileMenu.style.overflow = "hidden";
+      if (isOpen) {
+        mobileMenu.style.paddingTop = "6px";
+      } else {
+        setTimeout(() => {
+          mobileMenu.style.paddingTop = "0";
+        }, 200);
+      }
+    });
+
+    // FAQ accordion
+    const faqItems = document.querySelectorAll(".faq-item");
+
+    faqItems.forEach((item) => {
+      const question = item.querySelector(".faq-question");
+      const answer = item.querySelector(".faq-answer");
+      const toggle = item.querySelector(".faq-toggle");
+
+      question.addEventListener("click", () => {
+        const isOpen = answer.classList.contains("show");
+
+        // Close all other items
+        faqItems.forEach((otherItem) => {
+          const otherAnswer = otherItem.querySelector(".faq-answer");
+          const otherToggle = otherItem.querySelector(".faq-toggle");
+          if (otherAnswer !== answer) {
+            otherAnswer.classList.remove("show");
+            otherToggle.textContent = "+";
+          }
+        });
+
+        if (isOpen) {
+          answer.classList.remove("show");
+          toggle.textContent = "+";
+        } else {
+          answer.classList.add("show");
+          toggle.textContent = "−";
+        }
+      });
+    });
+
+    // Close mobile menu on nav link click
+    document.querySelectorAll(".nav-mobile a").forEach((link) => {
+      link.addEventListener("click", () => {
+        menuToggle.classList.remove("active");
+        mobileMenu.style.maxHeight = "0px";
+      });
+    });
+  </script>
+</body>
+</html>
